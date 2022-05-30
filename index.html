@@ -28,6 +28,7 @@
     crossorigin=""></script>
     <script src="https://unpkg.com/leaflet-gesture-handling"></script>
     <script src="Leaflet.BigImage.min.js"></script>
+    <script src='leaflet-easyprint.js'></script>
 
     <script>
         const mapObjects = {};
@@ -96,19 +97,33 @@
 
             // Custom marker
             var redDotMarker = L.icon({
-                iconUrl: 'https://upload.wikimedia.org/wikipedia/commons/e/ec/RedDot.svg',
+                iconUrl: 'RedDot.svg',
                 // iconUrl: 'Disc_Plain_red.svg',
                 iconSize:     [25, 25], // size of the icon
                 iconAnchor:   [12, 12], // point of the icon which will correspond to marker's location
                 popupAnchor:  [2, 2] // point from which the popup should open relative to the iconAnchor
             });
 
+            var blueDotMarker = L.icon({
+                iconUrl: 'BlueDot.svg',
+                // iconUrl: 'Disc_Plain_red.svg',
+                iconSize:     [10, 10], // size of the icon
+                iconAnchor:   [5, 5], // point of the icon which will correspond to marker's location
+                popupAnchor:  [2, 2] // point from which the popup should open relative to the iconAnchor
+            });
 
-            camps.forEach((camp) => {
+
+            camps.forEach((camp, index) => {
                 const pixelPoint = map.latLngToContainerPoint(L.latLng([camp.lat, camp.lng]))
                 var newPoint = L.point([pixelPoint.x , pixelPoint.y ]);
                 var newLatLng = map.containerPointToLatLng(newPoint);
-                var marker = L.marker(newLatLng, {icon: redDotMarker})
+
+                let markerIcon = blueDotMarker;
+                if (index == 0 || index == camps.length -1){
+                    markerIcon = redDotMarker;
+                } 
+
+                var marker = L.marker(newLatLng, {icon: markerIcon})
                     .bindTooltip(camp.day.toString())
                     .bindPopup(`<h4>${camp.day}</h4><p>${camp.description}</p>`)
                     .addTo(map);
@@ -117,7 +132,11 @@
 
             // L.control.bigImage().addTo(map);
 
-
+            L.easyPrint({
+                title: 'My awesome print button',
+                position: 'bottomright',
+                sizeModes: ['A4Portrait', 'A4Landscape']
+            }).addTo(map);
 
             mapObjects[mapId] = map;
         }
